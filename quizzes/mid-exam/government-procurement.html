@@ -1,0 +1,1362 @@
+<!DOCTYPE html>
+<html lang="en" data-mode="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta property="og:title" content="Public Procurement & Planning Assessment">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="./">
+  <meta property="og:description" content="60-question interactive Mid-exam assessment with instant answer reveal and offline progress saving">
+  <title>Public Procurement &amp; Planning Assessment</title>
+  <script>
+    (function () {
+      try {
+        var hubScheme = localStorage.getItem('color-scheme');
+        var mode = (hubScheme === 'light' || hubScheme === 'dark') ? hubScheme : localStorage.getItem('quiz-app-mode-v1');
+        if (mode !== 'light' && mode !== 'dark') {
+          mode = (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
+        }
+        document.documentElement.setAttribute('data-mode', mode);
+      } catch (e) {
+        document.documentElement.setAttribute('data-mode', 'light');
+      }
+    })();
+  </script>
+  <style>
+    :root {
+      --radius: 14px;
+    }
+
+    html[data-mode="dark"] {
+      --bg: #0b1220;
+      --card: #111827;
+      --text: #f9fafb;
+      --muted: #cbd5e1;
+      --border: #334155;
+      --success: #34d399;
+      --danger: #f87171;
+      --warning: #fbbf24;
+      --primary: #60a5fa;
+      --accent: #38bdf8;
+      --primary-contrast: #0b1220;
+      --chip-bg: rgba(96, 165, 250, 0.14);
+      --success-bg: rgba(52, 211, 153, 0.12);
+      --danger-bg: rgba(248, 113, 113, 0.12);
+      --warning-bg: rgba(251, 191, 36, 0.12);
+      color-scheme: dark;
+    }
+
+    html[data-mode="light"] {
+      --bg: #f8fafc;
+      --card: #ffffff;
+      --text: #0f172a;
+      --muted: #475569;
+      --border: #e2e8f0;
+      --success: #1e8e3e;
+      --danger: #d93025;
+      --warning: #b06000;
+      --primary: #0b5394;
+      --accent: #1a73e8;
+      --primary-contrast: #ffffff;
+      --chip-bg: rgba(11, 83, 148, 0.12);
+      --success-bg: rgba(30, 142, 62, 0.08);
+      --danger-bg: rgba(217, 48, 37, 0.08);
+      --warning-bg: rgba(176, 96, 0, 0.08);
+      color-scheme: light;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .hub-nav {
+      margin-bottom: 14px;
+    }
+
+    .hub-back {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      min-height: 44px;
+      padding: 8px 14px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: var(--card);
+      color: var(--primary);
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .hub-back:hover {
+      border-color: var(--accent);
+    }
+
+    .top {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 18px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      margin-bottom: 16px;
+    }
+
+    .brand {
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+      min-width: min(100%, 500px);
+    }
+
+    .badge {
+      width: 54px;
+      height: 54px;
+      flex: 0 0 auto;
+      display: grid;
+      place-items: center;
+      border-radius: 16px;
+      font-weight: 900;
+      font-size: 1.2rem;
+      color: var(--primary-contrast);
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(1.4rem, 3vw, 2.2rem);
+      line-height: 1.2;
+    }
+
+    .subtitle {
+      margin-top: 5px;
+      color: var(--muted);
+    }
+
+    .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .chip {
+      padding: 4px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: var(--chip-bg);
+      color: var(--primary);
+      font-size: 0.85rem;
+    }
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+
+    button {
+      font: inherit;
+      border-radius: 12px;
+      border: 1px solid transparent;
+      padding: 10px 14px;
+      cursor: pointer;
+    }
+
+    a:focus-visible,
+    button:focus-visible,
+    input:focus-visible,
+    select:focus-visible,
+    textarea:focus-visible {
+      outline: 3px solid var(--accent);
+      outline-offset: 2px;
+    }
+
+    .primary {
+      background: var(--primary);
+      color: var(--primary-contrast);
+      border-color: var(--primary);
+      font-weight: 700;
+    }
+
+    .primary:hover {
+      background: var(--accent);
+      border-color: var(--accent);
+    }
+
+    .secondary {
+      background: transparent;
+      color: var(--primary);
+      border-color: var(--primary);
+    }
+
+    .secondary:hover {
+      background: var(--chip-bg);
+    }
+
+    .instruction,
+    .notice {
+      color: var(--muted);
+      margin: 7px 0;
+    }
+
+    .part-nav {
+      display: flex;
+      gap: 10px;
+      overflow-x: auto;
+      padding: 8px 0 14px;
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      background: var(--bg);
+    }
+
+    .part-btn {
+      white-space: nowrap;
+      border-radius: 999px;
+      padding: 9px 14px;
+      border: 1px solid var(--border);
+      background: var(--card);
+      color: var(--muted);
+    }
+
+    .part-btn.active {
+      background: var(--primary);
+      border-color: var(--accent);
+      color: var(--primary-contrast);
+      font-weight: 700;
+    }
+
+    .page {
+      display: block;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .part-head {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px 18px;
+      margin-bottom: 16px;
+    }
+
+    .part-head h2 {
+      margin: 0 0 5px;
+    }
+
+    .muted {
+      color: var(--muted);
+    }
+
+    .q-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 18px;
+      margin-bottom: 16px;
+    }
+
+    .q-meta {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 8px;
+      color: var(--muted);
+      font-size: 0.88rem;
+    }
+
+    .q-num {
+      color: var(--primary);
+      font-weight: 800;
+    }
+
+    .q-text {
+      font-weight: 650;
+      margin-bottom: 14px;
+    }
+
+    .q-input {
+      margin-bottom: 14px;
+    }
+
+    .options {
+      display: grid;
+      gap: 10px;
+    }
+
+    .option {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+    }
+
+    .option:hover {
+      border-color: var(--accent);
+    }
+
+    .option input {
+      margin-top: 2px;
+      accent-color: var(--accent);
+    }
+
+    input[type="text"],
+    select,
+    textarea {
+      width: 100%;
+      font: inherit;
+      color: var(--text);
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 11px 12px;
+    }
+
+    textarea {
+      min-height: 130px;
+      resize: vertical;
+    }
+
+    .reveal-btn {
+      background: transparent;
+      color: var(--accent);
+      border: 1px solid var(--accent);
+      font-weight: 700;
+    }
+
+    .reveal-btn:hover {
+      background: var(--chip-bg);
+    }
+
+    .feedback {
+      margin-top: 14px;
+      padding: 12px 14px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+    }
+
+    .feedback.success {
+      color: var(--success);
+      border-color: var(--success);
+      background: var(--success-bg);
+    }
+
+    .feedback.danger {
+      color: var(--danger);
+      border-color: var(--danger);
+      background: var(--danger-bg);
+    }
+
+    .feedback.warning {
+      color: var(--warning);
+      border-color: var(--warning);
+      background: var(--warning-bg);
+    }
+
+    .fb-status {
+      font-weight: 800;
+      margin-bottom: 6px;
+    }
+
+    .fb-line {
+      margin: 4px 0;
+      color: var(--text);
+    }
+
+    .fb-muted {
+      color: var(--muted);
+    }
+
+    .pager {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      margin: 18px 0 30px;
+    }
+
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.55);
+      display: grid;
+      place-items: center;
+      padding: 20px;
+      z-index: 100;
+    }
+
+    .modal {
+      width: min(780px, 100%);
+      max-height: 90vh;
+      overflow: auto;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 22px;
+    }
+
+    .modal-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .modal-top h2 {
+      margin: 0;
+    }
+
+    .modal-close {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-size: 24px;
+      line-height: 1;
+      padding: 6px 12px;
+    }
+
+    .score-big {
+      font-size: 2rem;
+      font-weight: 900;
+      color: var(--primary);
+    }
+
+    .result-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 10px;
+      margin: 14px 0;
+    }
+
+    .result-box {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px;
+    }
+
+    .result-box .label {
+      color: var(--muted);
+      font-size: 0.88rem;
+      margin-bottom: 5px;
+    }
+
+    .result-box .value {
+      font-size: 1.25rem;
+      font-weight: 800;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 12px 0;
+    }
+
+    th,
+    td {
+      border: 1px solid var(--border);
+      padding: 9px;
+      text-align: left;
+    }
+
+    th {
+      color: var(--muted);
+    }
+
+    @media (max-width: 720px) {
+      .top {
+        flex-direction: column;
+      }
+
+      .controls {
+        width: 100%;
+      }
+
+      .part-nav {
+        position: static;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <nav class="hub-nav">
+      <a href="../../index.html" class="hub-back">&larr; Back to Quiz Hub</a>
+    </nav>
+
+    <header class="top">
+      <div class="brand">
+        <div class="badge" aria-hidden="true">PP</div>
+        <div>
+          <h1>Public Procurement & Planning Assessment</h1>
+          <div class="subtitle">60 questions · Parts 1–5</div>
+          <div class="tags">
+            <span class="chip">Mid-exam</span>
+            <span class="chip">Public Procurement & Planning</span>
+          </div>
+        </div>
+      </div>
+      <div class="controls">
+        <button id="modeBtn" type="button" class="secondary">Light mode</button>
+        <button id="resetBtn" type="button" class="secondary">Reset quiz</button>
+        <button id="resultsBtn" type="button" class="primary">View results</button>
+      </div>
+      <div style="width:100%">
+        <p class="instruction">Pick an answer, then tap Reveal answer to check it. Your score stays hidden until you tap View results — and any answer you have picked will count, even if you never revealed it.</p>
+        <p class="notice">Your progress is saved in this browser.</p>
+        <p class="notice">Everything you have picked will be scored, revealed or not.</p>
+      </div>
+    </header>
+
+    <nav id="partNav" class="part-nav" aria-label="Quiz parts"></nav>
+
+    <main id="pages"></main>
+  </div>
+
+  <div id="modalOverlay" class="modal-overlay hidden">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <div class="modal-top">
+        <h2 id="modalTitle">Your results</h2>
+        <button id="modalClose" type="button" class="modal-close" aria-label="Close results">×</button>
+      </div>
+      <div id="modalBody"></div>
+    </div>
+  </div>
+
+  <script>
+    if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
+      try {
+        navigator.serviceWorker.register('../../sw.js').then(function () {
+          if (typeof caches !== 'undefined') {
+            caches.open('quiz-hub-v1').then(function (cache) {
+              cache.add(location.href).catch(function () {});
+            }).catch(function () {});
+          }
+        }).catch(function () {});
+      } catch (e) {}
+    }
+
+    const LETTERS = ["A", "B", "C", "D"];
+
+    const TRUE_FALSE = [
+      [1, `Government procurement is primarily characterized as a result- or performance-driven activity rather than a procedure-driven process.`, `False`, `Public procurement is procedure-driven rather than result- or performance-driven due to strict legal frameworks.`],
+      [2, `In the long run, procurement design influences suppliers' and firms' incentives to invest in research and development and to innovate.`, `True`, ``],
+      [3, `Federal bidding and negotiation records are kept completely confidential from public scrutiny at all times to protect commercial privacy.`, `False`, `Federal procurement records are open to public review, except in cases where national security is directly involved.`],
+      [4, `Under established public procurement principles, no candidate may be discriminated against based on nationality, unless lawful rules of preference are applied.`, `True`, ``],
+      [5, `Public procurement personnel are legally permitted to serve as board directors or shareholders of a vendor company as long as the contract was awarded prior to their employment.`, `False`, `Officials are strictly barred from becoming partners, shareholders, directors, or managers of firms with government contracts during their tenure.`],
+      [6, `A "procurement process model" defines the specific operational procedures required to conduct a single purchase contract.`, `False`, `The procurement cycle governs a single purchase contract, whereas the procurement process model depicts the annual procurement program.`],
+      [7, `The majority of potential financial savings across the procurement lifecycle are realized during the planning stages rather than during contract execution.`, `True`, ``],
+      [8, `Once an annual procurement plan is formally approved, an agency is permitted to split procurements to facilitate faster execution.`, `False`, `Public bodies are expressly prohibited from splitting procurements or deviating from an approved procurement plan.`],
+      [9, `Before initiating a new procurement requisition, an agency must verify that the requirement cannot be met using existing unused resources or property.`, `True`, ``],
+      [10, `A public body is prohibited from modifying its approved annual procurement plan once a copy has been submitted to the oversight Agency.`, `False`, `A public body may modify its procurement plan at any time when necessary, provided changes are submitted to the Agency and relevant departments.`]
+    ];
+
+    const MC = [
+      [11, `Which statement best defines government procurement?`, [
+        `The informal acquisition of goods and supplies through spot-market buying using discretionary operational budgets`,
+        `The acquisition of goods, works, and services by a public entity using public funds through contractual arrangements after public competition`,
+        `The commercial exchange of assets and commercial inventory governed solely by private commercial negotiation`,
+        `The internal reallocation of surplus administrative equipment and supplies among civil ministries`
+      ], `B`],
+      [12, `Public procurement is defined as a "process" rather than a simple transaction because it:`, [
+        `Operates without strict adherence to statutory directives or documented standards`,
+        `Relies exclusively on informal handshakes and immediate spot-market buying`,
+        `Encompasses a series of interdependent procedures, specifications, and policies required to complete a single purchase`,
+        `Eliminates the administrative need for contract monitoring and post-delivery supplier management`
+      ], `C`],
+      [13, `The complexity of the procurement procedures applied to a specific item is primarily determined by the:`, [
+        `Discretionary preference of the individual procurement officer`,
+        `Nature, value, and risk level attached to the item`,
+        `Number of years the supplier has been registered in the market`,
+        `Physical size and weight of the goods being transported`
+      ], `B`],
+      [14, `In public procurement, achieving "optimum cost" means:`, [
+        `Selecting the bid with the lowest nominal sticker price regardless of durability`,
+        `Acquiring an item at the lowest possible whole-life cost while securing value for money`,
+        `Purchasing exclusively second-hand or discounted equipment to conserve funds`,
+        `Postponing capital acquisition until vendor prices drop in the general market`
+      ], `B`],
+      [15, `Why is public procurement subjected to stricter legal frameworks than private commercial purchasing?`, [
+        `Public procurement relies on taxpayer funds and represents a major share of the national budget`,
+        `Public sector organizations are legally barred from entering into formal written contracts`,
+        `Commercial enterprises are entirely exempt from financial accounting standards`,
+        `Government entities operate solely within fully uncompetitive, closed markets`
+      ], `A`],
+      [16, `How does procurement design immediately impact an economy or public entity in the short run?`, [
+        `By reshaping the national school curriculum and academic research output`,
+        `By immediately determining the costs and quality of operational inputs`,
+        `By directing the long-term capital investments of multinational manufacturers`,
+        `By replacing standard commercial accounting practices across all private industries`
+      ], `B`],
+      [17, `Which core objective is shared by both government and commercial purchasing?`, [
+        `Operating primarily through confidential, non-advertised negotiations`,
+        `Applying socioeconomic preference programs to all vendor selections`,
+        `Obtaining the right quality, quantity, price, time, and source to maximize value`,
+        `Maintaining open public access to proprietary vendor financial bids`
+      ], `C`],
+      [18, `What is a direct consequence of the exceptionally large size and technical complexity of federal purchases?`, [
+        `It eliminates the need for formal specifications and compliance audits`,
+        `It restricts the number of potential vendors capable of fulfilling contractual requirements`,
+        `It exempts the purchasing agency from statutory budgetary constraints`,
+        `It guarantees that smaller local suppliers automatically win the primary bids`
+      ], `B`],
+      [19, `Which watchdog body is typically utilized in the public sector to review compliance with strict product specifications and ensure accountability for funds?`, [
+        `The general accounting office or national audit authority`,
+        `The Chamber of Commerce`,
+        `The participating suppliers' trade union`,
+        `An international commercial arbitration tribunal`
+      ], `A`],
+      [20, `All bidding and negotiation information in government procurement is accessible for public review except when:`, [
+        `The procurement value exceeds the standard departmental annual threshold`,
+        `The contract involves complex commercial technology`,
+        `National security concerns are directly involved`,
+        `The winning vendor requests complete financial confidentiality`
+      ], `C`],
+      [21, `What challenge does the "diffusion of authority" present in government purchasing?`, [
+        `Suppressing competitive price solicitation across regional vendors`,
+        `Difficulty in identifying which specific agency or contracting officer holds the authority to award a contract`,
+        `Ensuring suppliers comply with basic health and safety regulations`,
+        `Transitioning the public body from paper contracts to digital archives`
+      ], `B`],
+      [22, `Which of the following is recognized as a persistent administrative problem in government purchasing?`, [
+        `Locating reliable vendors for obscure products and niche services`,
+        `Excessively low volumes of documentation and regulatory paperwork`,
+        `Total absence of dissatisfied supplier protests or formal appeals`,
+        `Inability to identify standard catalog items in urban consumer markets`
+      ], `A`],
+      [23, `How do modern governments utilize public procurement as a strategic tool for broader policy goals?`, [
+        `By implementing sustainable practices such as green procurement`,
+        `By creating state monopolies that exclude private suppliers`,
+        `By eliminating the necessity of market price assessments`,
+        `By waiving technical specifications for selected commercial providers`
+      ], `A`],
+      [24, `Under public procurement ethical codes, an official violates rules against "private gain" when they:`, [
+        `Conduct an open price survey across local regional suppliers`,
+        `Disclose personal business ties to an ethics compliance officer`,
+        `Accept gifts or material benefits from bidders for themselves or family members`,
+        `Reallocate unused property within different branches of their agency`
+      ], `C`],
+      [25, `The mandatory ethical procedure of "recusal" requires a public official to:`, [
+        `Remove themselves from participating in decisions involving a potential conflict of interest`,
+        `Reject all competitive bids that exceed the internal cost estimate`,
+        `Approve emergency contracts without prior budgetary allocation`,
+        `Disclose proprietary bidder information to the general press`
+      ], `A`],
+      [26, `Which administrative protection is critical to encourage staff to report corruption or procedural violations in public purchasing?`, [
+        `Mandatory private arbitration agreements`,
+        `Whistleblower and information-disclosure protections`,
+        `Non-disclosure agreements signed with winning vendors`,
+        `Discretionary bonuses tied to procurement project completion`
+      ], `B`],
+      [27, `What is the fundamental distinction between a "procurement process model" and a "procurement cycle"?`, [
+        `The process model applies only to works, whereas the cycle applies only to services`,
+        `The process model covers the annual procurement program, while the cycle governs an individual purchase contract`,
+        `The cycle is conducted by external auditors, whereas the model is run by end users`,
+        `The process model is informal, whereas the cycle is legally binding`
+      ], `B`],
+      [28, `A Government Procurement Plan (GPP) is defined as a formal document that:`, [
+        `Replaces standard technical specifications with commercial vendor catalogs`,
+        `Summarizes past financial audits conducted over the previous decade`,
+        `Outlines the strategy, schedule, resources, and methods for acquisitions aligned with the agency's budget cycle`,
+        `Grants individual department heads authority to execute spot purchases without oversight`
+      ], `C`],
+      [29, `Procurement planning is typically carried out concurrently with which institutional process?`, [
+        `The annual budgeting process`,
+        `The final contract dispute settlement`,
+        `The post-warranty asset disposal stage`,
+        `The bi-annual supplier performance appraisal`
+      ], `A`],
+      [30, `Why is proactive procurement planning required even in unpredictable or emergency environments?`, [
+        `To guarantee that market prices remain completely fixed over time`,
+        `To establish contingency plans and improve preparedness for future operational needs`,
+        `To circumvent standard statutory financial record-keeping requirements`,
+        `To eliminate the necessity of obtaining final approval from the agency head`
+      ], `B`],
+      [31, `Which of the following is an essential question answered directly by a procurement plan?`, [
+        `Who are the equity shareholders of every bidding company?`,
+        `Why, what, when, how, and by whom will acquisitions be carried out?`,
+        `Which political party currently oversees the ministerial budget?`,
+        `What are the retail resale margins of competing commercial distributors?`
+      ], `B`],
+      [32, `Which component is explicitly required in a standard public procurement plan document?`, [
+        `The procurement number, lot, description, schedule, and budget source`,
+        `The proprietary manufacturing blueprints of potential foreign suppliers`,
+        `The personal bank account statements of evaluation committee members`,
+        `The historical market stock prices of major international bidders`
+      ], `A`],
+      [33, `A major objective of preparing a comprehensive procurement plan is to improve efficiency by discouraging:`, [
+        `Standardized technical descriptions`,
+        `Piecemeal, fragmented purchasing`,
+        `Competitive market price surveys`,
+        `Long-term framework contracts`
+      ], `B`],
+      [34, `What is the first major step in the public procurement planning process?`, [
+        `Approval of the procurement plan by the agency head`,
+        `Identification and packaging of procurement needs`,
+        `Selection of the specific procurement method`,
+        `Setting the timetable for bid floating`
+      ], `B`],
+      [35, `When identifying annual needs, why must a public body survey its existing property before initiating purchases?`, [
+        `To determine if the requirement can be satisfied using unused existing inventory`,
+        `To calculate depreciation rates for private commercial suppliers`,
+        `To assess whether the agency should sell off its primary office space`,
+        `To establish whether staff members have adequate personal office supplies`
+      ], `A`],
+      [36, `In the need identification phase, agencies are advised to specify items that are standard and widely available in order to:`, [
+        `Restrict competition to a single preferred vendor`,
+        `Avoid custom manufacturing delays and ensure competitive market availability`,
+        `Eliminate the need for setting statutory bid floating timetables`,
+        `Ensure the procurement is classified under direct single-source purchase`
+      ], `B`],
+      [37, `What is the primary purpose of packaging procurement requirements into lots?`, [
+        `To obscure the total contract value from public procurement oversight bodies`,
+        `To allow single large conglomerates to monopolize all contract deliverables`,
+        `To group related needs logically and attract healthy competition, including local producers`,
+        `To circumvent formal contract endorsement procedures`
+      ], `C`],
+      [38, `How does a public body establish realistic baseline cost estimates during procurement planning?`, [
+        `By conducting market price surveys or analyzing current reliable price data`,
+        `By guessing based on arbitrary previous budget surpluses`,
+        `By adopting the highest quotation provided by an exclusive supplier`,
+        `By calculating the replacement cost of unrelated capital assets`
+      ], `A`],
+      [39, `When establishing procurement timetables, the public body must ensure that the schedule:`, [
+        `Is kept as brief as possible by avoiding floating periods for bidders`,
+        `Complies with the statutory minimum floating period while allowing bidders reasonable preparation time`,
+        `Overrides the agency's primary operational work program`,
+        `Restricts bid document preparation to a maximum of forty-eight hours`
+      ], `B`],
+      [40, `Who possesses the formal authority to approve an agency's annual procurement plan following consultation with the Procurement Endorsing Committee?`, [
+        `The head of the Public Body`,
+        `The lowest evaluated responsive bidder`,
+        `The external commercial auditor`,
+        `The head of the end-user requisitioning department`
+      ], `A`]
+    ];
+
+    const FILL_BLANK = [
+      [41, `Acquiring an item at the lowest possible whole-life cost while ensuring value for money is referred to as purchasing at ________ cost.`, `optimum`, [`optimum`, `optimal`]],
+      [42, `Because public procurement must strictly adhere to statutory legal frameworks and formalized stages rather than immediate outcomes, it is described as ________-driven.`, `procedure`, [`procedure`]],
+      [43, `The specific sequence of operational procedures followed to execute a single, individual purchase contract is known as the procurement ________.`, `cycle`, [`cycle`]],
+      [44, `Making frequent, uncoordinated small purchases of the same item instead of consolidating demand into bulk orders is termed ________ purchasing.`, `piecemeal`, [`piecemeal`]],
+      [45, `The mandatory withdrawal of a procurement official from evaluating or deciding on a contract due to a potential conflict of interest is called ________.`, `recusal (or withdrawal)`, [`recusal`, `withdrawal`]]
+    ];
+
+    const MATCH_DEFS = [
+      [`A`, `The statutory minimum duration during which tender notices must remain open for bidders to prepare and submit bids.`],
+      [`B`, `The strategic consolidation of similar or related procurement items into lots to enhance competition and attract local suppliers.`],
+      [`C`, `An internal consultative entity that reviews the annual procurement plan before it is submitted to the head of the Public Body for approval.`],
+      [`D`, `The bureaucratic challenge where it is difficult to determine which specific agency or official has the legal power to let a contract.`],
+      [`E`, `The specific procedural sequence undertaken to execute an individual, single purchase contract.`],
+      [`F`, `A statutory exception to the non-discrimination principle that permits favoring local producers and small/micro-enterprises.`],
+      [`G`, `The acquisition of an item at the lowest possible whole-life expenditure while ensuring value for money.`],
+      [`H`, `The inefficient practice of conducting fragmented, small-scale purchases that undermines economies of scale.`],
+      [`I`, `The mandatory self-removal of a public official from participating in a procurement decision due to a conflict of interest.`],
+      [`J`, `The overarching annual framework depicting all purchasing activities carried out by a public entity over a fiscal period.`]
+    ].map(([k, text]) => ({ k, text }));
+
+    const MATCH_TERMS = [
+      [46, `Optimum Cost`, `G`],
+      [47, `Recusal`, `I`],
+      [48, `Diffusion of Authority`, `D`],
+      [49, `Procurement Cycle`, `E`],
+      [50, `Procurement Process Model`, `J`],
+      [51, `Packaging`, `B`],
+      [52, `Piecemeal Purchasing`, `H`],
+      [53, `Minimum Floating Period`, `A`],
+      [54, `Procurement Endorsing Committee`, `C`],
+      [55, `Rule of Preferences`, `F`]
+    ];
+
+    const SHORTS = [
+      [56, `Explain how procurement design influences an economy or organization differently in the short run compared to the long run.`,
+        `In the short run, procurement design directly determines the immediate costs and quality of operational inputs, whereas in the long run, it shapes suppliers' and contractors' economic incentives to invest in research, development, and technological innovation.`,
+        [[`short`], [`cost`], [`quality`], [`input`], [`long`], [`incentive`], [`research`], [`development`], [`innovation`]]],
+      [57, `Why is public procurement characterized as "procedure-driven" rather than "performance-driven"?`,
+        `Public procurement is procedure-driven because public funds are derived from taxpayers, requiring strict adherence to legal mandates, statutory accountability, and standardized processes to prevent fraud rather than pursuing flexible, bottom-line results.`,
+        [[`public`], [`taxpayer`], [`fund`], [`legal`, `statutory`], [`accountab`], [`standard`], [`process`], [`fraud`], [`procedure`]]],
+      [58, `What is the operational rationale for auditing existing unused property within a public body before approving a new procurement requisition?`,
+        `Auditing existing property ensures that public entities prevent redundant expenditures and wastage by exhausting usable internal inventory before spending new public funds.`,
+        [[`existing`], [`unused`, `idle`], [`inventory`, `property`, `resource`], [`redundant`], [`expenditure`, `spend`, `cost`], [`wastage`, `waste`], [`public`], [`fund`], [`before`, `prior`, `first`]]],
+      [59, `Explain why public bodies organize procurement needs into packages and lots rather than letting bulk purchases without division.`,
+        `Dividing procurement into packages and lots prevents monopolization, aligns purchase sizes with market supply capacity, and enables smaller local enterprises to submit viable bids.`,
+        [[`package`], [`lot`], [`monopol`], [`competition`, `competitive`], [`capacity`, `supply`], [`local`], [`small`, `enterprise`, `supplier`, `firm`], [`bid`]]],
+      [60, `Describe the formal procedure required when a public body must modify an approved annual procurement plan.`,
+        `When an approved procurement plan must be modified, the revisions must be formally approved by the head of the Public Body and transmitted to the oversight Agency and relevant internal departments.`,
+        [[`modif`, `change`, `revision`], [`approv`], [`head`], [`public body`], [`oversight`], [`agency`], [`department`], [`transmit`, `submit`, `send`], [`formal`]]]
+    ];
+
+    const QUIZ = {
+      title: `Public Procurement & Planning Assessment`,
+      subtitle: `60 questions · Parts 1–5`,
+      parts: [
+        {
+          id: `part-1`,
+          label: `Part 1`,
+          name: `True or False`,
+          nav: `1 True/False · 10`,
+          range: `Questions 1–10`,
+          questions: TRUE_FALSE.map(([n, text, answer, explanation]) => ({
+            id: `q${n}`, n, type: `tf`, text, answer, explanation
+          }))
+        },
+        {
+          id: `part-2`,
+          label: `Part 2`,
+          name: `Multiple Choice`,
+          nav: `2 Multiple Choice · 30`,
+          range: `Questions 11–40`,
+          questions: MC.map(([n, text, choices, answer]) => ({
+            id: `q${n}`, n, type: `mc`, text,
+            choices: choices.map((choiceText, i) => ({ k: LETTERS[i], text: choiceText })),
+            answer,
+            explanation: `${answer} — ${choices[LETTERS.indexOf(answer)]}`
+          }))
+        },
+        {
+          id: `part-3`,
+          label: `Part 3`,
+          name: `Fill in the Blank`,
+          nav: `3 Fill in Blank · 5`,
+          range: `Questions 41–45`,
+          questions: FILL_BLANK.map(([n, text, answerDisplay, accepted]) => ({
+            id: `q${n}`, n, type: `fill`, text, answerDisplay, accepted, explanation: ``
+          }))
+        },
+        {
+          id: `part-4`,
+          label: `Part 4`,
+          name: `Matching`,
+          nav: `4 Matching · 10`,
+          range: `Questions 46–55`,
+          questions: MATCH_TERMS.map(([n, term, answer]) => ({
+            id: `q${n}`, n, type: `match`, term,
+            text: `Match the term "${term}" to its correct definition.`,
+            answer,
+            definitions: MATCH_DEFS,
+            explanation: ``
+          }))
+        },
+        {
+          id: `part-5`,
+          label: `Part 5`,
+          name: `Short Answer`,
+          nav: `5 Short Answer · 5`,
+          range: `Questions 56–60`,
+          questions: SHORTS.map(([n, text, answer, concepts]) => ({
+            id: `q${n}`, n, type: `short`, text, answer, concepts, explanation: ``
+          }))
+        }
+      ]
+    };
+
+    const STORAGE_KEY = `quiz-app-v1-public-procurement-planning-assessment`;
+    const HUB_PROGRESS_KEY = `quiz_hub_progress_gov-procurement-mid`;
+    const MODE_KEY = `quiz-app-mode-v1`;
+
+    let state = {
+      answers: {},
+      revealed: {},
+      activePart: QUIZ.parts[0].id
+    };
+
+    function esc(value) {
+      return String(value ?? ``).replace(/[&<>"']/g, (c) => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;"
+      }[c]));
+    }
+
+    function normalize(value) {
+      return String(value || ``)
+        .toLowerCase()
+        .replace(/[^a-z0-9\s]/gi, " ")
+        .replace(/\s+/g, " ")
+        .trim();
+    }
+
+    function loadState() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return;
+        const parsed = JSON.parse(raw);
+        if (parsed && typeof parsed === "object") {
+          state.answers = parsed.answers || {};
+          state.revealed = parsed.revealed || {};
+          if (QUIZ.parts.some(part => part.id === parsed.activePart)) {
+            state.activePart = parsed.activePart;
+          }
+        }
+      } catch (e) {}
+    }
+
+    function syncHubProgress() {
+      try {
+        const results = calculateResults();
+        localStorage.setItem(HUB_PROGRESS_KEY, JSON.stringify({
+          score: results.percent,
+          completed: results.unanswered === 0,
+          updatedAt: Date.now()
+        }));
+      } catch (e) {}
+    }
+
+    function saveState() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      } catch (e) {}
+      syncHubProgress();
+    }
+
+    function currentAnswer(q) {
+      return state.answers[q.id] ?? ``;
+    }
+
+    function isUnanswered(q) {
+      const value = currentAnswer(q);
+      if (q.type === `fill` || q.type === `short`) {
+        return String(value).trim() === ``;
+      }
+      return !value;
+    }
+
+    function evaluateFill(q) {
+      const norm = normalize(currentAnswer(q));
+      return (q.accepted || []).some(term => norm.includes(normalize(term)));
+    }
+
+    function evaluateShort(q) {
+      const norm = normalize(currentAnswer(q));
+      const concepts = q.concepts || [];
+      let matched = 0;
+      concepts.forEach(group => {
+        if ((group || []).some(term => norm.includes(term))) matched += 1;
+      });
+      const total = concepts.length;
+      const required = Math.ceil(total * 0.6);
+      return {
+        correct: total ? matched >= required : false,
+        matched,
+        total,
+        required
+      };
+    }
+
+    function isCorrect(q) {
+      if (isUnanswered(q)) return false;
+      if (q.type === `tf` || q.type === `mc` || q.type === `match`) {
+        return currentAnswer(q) === q.answer;
+      }
+      if (q.type === `fill`) {
+        return evaluateFill(q);
+      }
+      if (q.type === `short`) {
+        return evaluateShort(q).correct;
+      }
+      return false;
+    }
+
+    function correctAnswerDisplay(q) {
+      if (q.type === `tf`) return q.answer;
+      if (q.type === `mc`) {
+        const choice = (q.choices || []).find(c => c.k === q.answer);
+        return choice ? `${q.answer} — ${choice.text}` : q.answer;
+      }
+      if (q.type === `fill`) return q.answerDisplay;
+      if (q.type === `match`) {
+        const def = (q.definitions || []).find(d => d.k === q.answer);
+        return def ? `${q.answer} — ${def.text}` : q.answer;
+      }
+      if (q.type === `short`) return q.answer;
+      return ``;
+    }
+
+    function updateFeedback(q, card) {
+      card = card || document.getElementById(`card-${q.id}`);
+      if (!card) return;
+      const feedback = card.querySelector(`.feedback`);
+      if (!feedback) return;
+
+      if (!state.revealed[q.id]) {
+        feedback.hidden = true;
+        feedback.className = `feedback hidden`;
+        feedback.innerHTML = ``;
+        return;
+      }
+
+      const unanswered = isUnanswered(q);
+      const correct = isCorrect(q);
+
+      let status = ``;
+      let cls = ``;
+
+      if (unanswered) {
+        status = `Not answered yet`;
+        cls = `warning`;
+      } else if (correct) {
+        status = `Correct`;
+        cls = `success`;
+      } else {
+        status = `Incorrect`;
+        cls = `danger`;
+      }
+
+      let html = `<div class="fb-status">${esc(status)}</div>`;
+
+      if (q.type === `short` && !unanswered) {
+        const evaluation = evaluateShort(q);
+        html += `<div class="fb-line fb-muted">Keyword match: ${evaluation.matched}/${evaluation.total} concepts (need ${evaluation.required}).</div>`;
+      }
+
+      if (q.type === `short`) {
+        html += `<div class="fb-line"><strong>Model answer:</strong> ${esc(q.answer)}</div>`;
+      } else {
+        html += `<div class="fb-line"><strong>Correct answer:</strong> ${esc(correctAnswerDisplay(q))}</div>`;
+      }
+
+      if (q.explanation && q.type === `tf`) {
+        html += `<div class="fb-line"><strong>Explanation:</strong> ${esc(q.explanation)}</div>`;
+      }
+
+      feedback.hidden = false;
+      feedback.className = `feedback ${cls}`;
+      feedback.innerHTML = html;
+    }
+
+    function renderQuestion(q, part) {
+      const card = document.createElement(`article`);
+      card.className = `q-card`;
+      card.id = `card-${q.id}`;
+
+      let inputHtml = ``;
+
+      if (q.type === `tf`) {
+        inputHtml = `<div class="options">` + [`True`, `False`].map(value => {
+          const checked = state.answers[q.id] === value ? `checked` : ``;
+          return `<label class="option"><input type="radio" name="${q.id}" value="${value}" ${checked}><span>${value}</span></label>`;
+        }).join(``) + `</div>`;
+      } else if (q.type === `mc`) {
+        inputHtml = `<div class="options">` + q.choices.map(choice => {
+          const checked = state.answers[q.id] === choice.k ? `checked` : ``;
+          return `<label class="option"><input type="radio" name="${q.id}" value="${choice.k}" ${checked}><span><strong>${choice.k}.</strong> ${esc(choice.text)}</span></label>`;
+        }).join(``) + `</div>`;
+      } else if (q.type === `fill`) {
+        inputHtml = `<input type="text" id="input-${q.id}" aria-label="Answer for question ${q.n}" placeholder="Type your answer" value="${esc(state.answers[q.id] || ``)}">`;
+      } else if (q.type === `match`) {
+        inputHtml = `<select id="input-${q.id}" aria-label="Match definition for question ${q.n}">
+          <option value="">Select definition</option>
+          ${q.definitions.map(def => {
+            const selected = state.answers[q.id] === def.k ? `selected` : ``;
+            return `<option value="${def.k}" ${selected}>${def.k}. ${esc(def.text)}</option>`;
+          }).join(``)}
+        </select>`;
+      } else if (q.type === `short`) {
+        inputHtml = `<textarea id="input-${q.id}" aria-label="Answer for question ${q.n}" placeholder="Type your answer here">${esc(state.answers[q.id] || ``)}</textarea>`;
+      }
+
+      card.innerHTML = `
+        <div class="q-meta">
+          <span class="q-num">Question ${q.n}</span>
+          <span>${esc(part.label)} · ${esc(part.name)}</span>
+        </div>
+        <div class="q-text">${esc(q.text)}</div>
+        <div class="q-input">${inputHtml}</div>
+        <button type="button" class="reveal-btn">Reveal answer</button>
+        <div class="feedback hidden" aria-live="polite"></div>
+      `;
+
+      if (q.type === `tf` || q.type === `mc`) {
+        card.querySelectorAll(`input[type="radio"]`).forEach(input => {
+          input.addEventListener(`change`, () => {
+            state.answers[q.id] = input.value;
+            saveState();
+            if (state.revealed[q.id]) updateFeedback(q, card);
+          });
+        });
+      }
+
+      if (q.type === `fill` || q.type === `short`) {
+        const input = card.querySelector(`#input-${q.id}`);
+        input.addEventListener(`input`, () => {
+          state.answers[q.id] = input.value;
+          saveState();
+          if (state.revealed[q.id]) updateFeedback(q, card);
+        });
+      }
+
+      if (q.type === `match`) {
+        const select = card.querySelector(`#input-${q.id}`);
+        select.addEventListener(`change`, () => {
+          state.answers[q.id] = select.value;
+          saveState();
+          if (state.revealed[q.id]) updateFeedback(q, card);
+        });
+      }
+
+      card.querySelector(`.reveal-btn`).addEventListener(`click`, () => {
+        state.revealed[q.id] = true;
+        saveState();
+        updateFeedback(q, card);
+      });
+
+      if (state.revealed[q.id]) {
+        updateFeedback(q, card);
+      }
+
+      return card;
+    }
+
+    function renderNav() {
+      const nav = document.getElementById(`partNav`);
+      nav.innerHTML = ``;
+      QUIZ.parts.forEach(part => {
+        const button = document.createElement(`button`);
+        button.type = `button`;
+        button.className = `part-btn`;
+        button.id = `nav-${part.id}`;
+        button.textContent = part.nav;
+        button.title = `${part.label}: ${part.name} (${part.range})`;
+        button.addEventListener(`click`, () => showPart(part.id));
+        nav.appendChild(button);
+      });
+    }
+
+    function renderPages() {
+      const pages = document.getElementById(`pages`);
+      pages.innerHTML = ``;
+
+      QUIZ.parts.forEach((part, index) => {
+        const section = document.createElement(`section`);
+        section.className = `page hidden`;
+        section.id = `page-${part.id}`;
+
+        const head = document.createElement(`div`);
+        head.className = `part-head`;
+        head.innerHTML = `
+          <h2>${esc(part.label)}: ${esc(part.name)}</h2>
+          <div class="muted">${esc(part.range)} · ${part.questions.length} questions</div>
+        `;
+        section.appendChild(head);
+
+        part.questions.forEach(q => {
+          section.appendChild(renderQuestion(q, part));
+        });
+
+        const pager = document.createElement(`div`);
+        pager.className = `pager`;
+
+        if (index > 0) {
+          const prev = document.createElement(`button`);
+          prev.type = `button`;
+          prev.className = `secondary`;
+          prev.textContent = `← Previous`;
+          prev.addEventListener(`click`, () => showPart(QUIZ.parts[index - 1].id));
+          pager.appendChild(prev);
+        } else {
+          pager.appendChild(document.createElement(`span`));
+        }
+
+        if (index < QUIZ.parts.length - 1) {
+          const next = document.createElement(`button`);
+          next.type = `button`;
+          next.className = `primary`;
+          next.textContent = `Next →`;
+          next.addEventListener(`click`, () => showPart(QUIZ.parts[index + 1].id));
+          pager.appendChild(next);
+        } else {
+          pager.appendChild(document.createElement(`span`));
+        }
+
+        section.appendChild(pager);
+        pages.appendChild(section);
+      });
+    }
+
+    function showPart(partId) {
+      state.activePart = partId;
+      saveState();
+
+      document.querySelectorAll(`.page`).forEach(page => {
+        page.classList.toggle(`hidden`, page.id !== `page-${partId}`);
+      });
+
+      document.querySelectorAll(`.part-btn`).forEach(button => {
+        button.classList.toggle(`active`, button.id === `nav-${partId}`);
+      });
+
+      window.scrollTo({ top: 0, behavior: `smooth` });
+    }
+
+    function calculateResults() {
+      let totalScore = 0;
+      let totalPossible = 0;
+      let unanswered = 0;
+
+      const partRows = QUIZ.parts.map(part => {
+        let partScore = 0;
+
+        part.questions.forEach(q => {
+          totalPossible += 1;
+          if (isUnanswered(q)) {
+            unanswered += 1;
+          } else if (isCorrect(q)) {
+            totalScore += 1;
+            partScore += 1;
+          }
+        });
+
+        return {
+          label: `${part.label}: ${part.name}`,
+          score: partScore,
+          possible: part.questions.length
+        };
+      });
+
+      const percent = totalPossible ? Math.round((totalScore / totalPossible) * 100) : 0;
+
+      return { totalScore, totalPossible, unanswered, partRows, percent };
+    }
+
+    function openResults() {
+      const results = calculateResults();
+      syncHubProgress();
+      const modalBody = document.getElementById(`modalBody`);
+
+      modalBody.innerHTML = `
+        <div class="score-big">${results.totalScore} / ${results.totalPossible}</div>
+        <div class="result-grid">
+          <div class="result-box">
+            <div class="label">Percentage</div>
+            <div class="value">${results.percent}%</div>
+          </div>
+          <div class="result-box">
+            <div class="label">Unanswered</div>
+            <div class="value">${results.unanswered}</div>
+          </div>
+          <div class="result-box">
+            <div class="label">Total possible</div>
+            <div class="value">${results.totalPossible}</div>
+          </div>
+        </div>
+        <p class="notice">Everything you have picked will be scored, revealed or not.</p>
+        <table>
+          <thead>
+            <tr>
+              <th>Part</th>
+              <th>Score</th>
+              <th>Possible</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${results.partRows.map(row => `
+              <tr>
+                <td>${esc(row.label)}</td>
+                <td>${row.score}</td>
+                <td>${row.possible}</td>
+              </tr>
+            `).join(``)}
+          </tbody>
+        </table>
+        <p class="notice">Fill-in-the-blank and short-answer items are automatically keyword-scored.</p>
+      `;
+
+      document.getElementById(`modalOverlay`).classList.remove(`hidden`);
+      document.body.style.overflow = `hidden`;
+    }
+
+    function closeModal() {
+      document.getElementById(`modalOverlay`).classList.add(`hidden`);
+      document.body.style.overflow = ``;
+    }
+
+    function currentMode() {
+      return document.documentElement.getAttribute(`data-mode`) || `dark`;
+    }
+
+    function setMode(mode) {
+      document.documentElement.setAttribute(`data-mode`, mode);
+      try {
+        localStorage.setItem(MODE_KEY, mode);
+      } catch (e) {}
+      updateModeButton();
+    }
+
+    function updateModeButton() {
+      const button = document.getElementById(`modeBtn`);
+      button.textContent = currentMode() === `dark` ? `Light mode` : `Dark mode`;
+    }
+
+    document.getElementById(`modeBtn`).addEventListener(`click`, () => {
+      setMode(currentMode() === `dark` ? `light` : `dark`);
+    });
+
+    document.getElementById(`resultsBtn`).addEventListener(`click`, openResults);
+    document.getElementById(`modalClose`).addEventListener(`click`, closeModal);
+
+    document.getElementById(`modalOverlay`).addEventListener(`click`, (event) => {
+      if (event.target === event.currentTarget) closeModal();
+    });
+
+    document.addEventListener(`keydown`, (event) => {
+      if (event.key === `Escape`) closeModal();
+    });
+
+    document.getElementById(`resetBtn`).addEventListener(`click`, () => {
+      const confirmed = confirm(`Reset quiz? All saved answers and revealed states will be cleared.`);
+      if (!confirmed) return;
+
+      try {
+        localStorage.removeItem(STORAGE_KEY);
+        localStorage.removeItem(HUB_PROGRESS_KEY);
+      } catch (e) {}
+
+      state = {
+        answers: {},
+        revealed: {},
+        activePart: QUIZ.parts[0].id
+      };
+
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      } catch (e) {}
+      renderPages();
+      showPart(state.activePart);
+      closeModal();
+    });
+
+    loadState();
+    renderNav();
+    renderPages();
+    showPart(state.activePart);
+    updateModeButton();
+  </script>
+</body>
+</html>
