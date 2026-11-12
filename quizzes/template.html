@@ -1,0 +1,328 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <title>Quiz Template</title>
+  <style>
+    :root {
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --border: #e2e8f0;
+      --result-bg: #f1f5f9;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #0f172a;
+        --card-bg: #1e293b;
+        --text: #f8fafc;
+        --text-muted: #94a3b8;
+        --primary: #3b82f6;
+        --primary-hover: #60a5fa;
+        --border: #334155;
+        --result-bg: #334155;
+      }
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      padding-top: max(16px, env(safe-area-inset-top));
+      padding-bottom: max(24px, env(safe-area-inset-bottom));
+      padding-left: max(16px, env(safe-area-inset-left));
+      padding-right: max(16px, env(safe-area-inset-right));
+      max-width: 680px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    nav {
+      margin-bottom: 20px;
+    }
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      min-height: 44px;
+      color: var(--primary);
+      text-decoration: none;
+      font-weight: 500;
+    }
+    .back-link:hover, .back-link:focus {
+      text-decoration: underline;
+    }
+    header {
+      margin-bottom: 24px;
+    }
+    .subject-tag {
+      display: inline-block;
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--primary);
+      margin-bottom: 4px;
+    }
+    h1 {
+      font-size: 1.75rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    .quiz-form {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .question-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+    }
+    .question-prompt {
+      font-weight: 600;
+      font-size: 1.05rem;
+      margin-bottom: 12px;
+      padding: 0 4px;
+    }
+    .option-label {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-height: 44px;
+      padding: 8px 12px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      margin-bottom: 8px;
+      cursor: pointer;
+      transition: background-color 0.15s ease;
+    }
+    .option-label:last-child {
+      margin-bottom: 0;
+    }
+    .option-label:hover {
+      background-color: var(--bg);
+    }
+    .option-label input[type="radio"] {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--primary);
+      cursor: pointer;
+    }
+    .submit-btn {
+      display: block;
+      width: 100%;
+      min-height: 48px;
+      background-color: var(--primary);
+      color: #ffffff;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 8px;
+      transition: background-color 0.15s ease;
+    }
+    .submit-btn:hover {
+      background-color: var(--primary-hover);
+    }
+    .result-status {
+      padding: 14px;
+      background: var(--result-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-weight: 600;
+      text-align: center;
+      font-size: 1.1rem;
+    }
+  </style>
+</head>
+<body>
+  <!-- Note: Copy this template into quizzes/<subject>/<quiz-id>.html (2 folders deep) so ../../index.html and ../../sw.js resolve to repository root -->
+  <nav>
+    <a href="../../index.html" class="back-link">&larr; Back to Quiz Hub</a>
+  </nav>
+
+  <main id="quiz-root"></main>
+
+  <script>
+    // Offline service worker registration + direct-link cache self-seeding
+    if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
+      try {
+        navigator.serviceWorker.register('../../sw.js').then(function() {
+          if (typeof caches !== 'undefined') {
+            caches.open('quiz-hub-v1').then(function(cache) {
+              cache.add(location.href).catch(function() {});
+            }).catch(function() {});
+          }
+        }).catch(function() {});
+      } catch (err) {}
+    }
+
+    // ========================================================================
+    // TEACHERS: Edit this configuration directly in GitHub web interface!
+    //
+    // HOW TO CREATE A NEW QUIZ:
+    // 1. Copy this file into quizzes/<subject>/<your-quiz-id>.html
+    // 2. Customize QUIZ_CONFIG below:
+    //    - id: lowercase unique identifier (e.g. 'math-fractions', 'history-rome')
+    //    - title: the display title of your quiz
+    //    - subject: subject category matching the hub (e.g. 'Mathematics', 'Science')
+    //    - questions: array of questions with prompt, options, and 0-based answerIndex
+    // 3. Commit directly to main. It works offline instantly without any build!
+    // ========================================================================
+    // shortcut: single-selection radio inputs only, upgrade to multi-select checkboxes or free-text answers if curriculum requires complex question types
+    window.QUIZ_CONFIG = {
+      id: 'subject-quiz-id',
+      title: 'Quiz Title',
+      subject: 'Subject',
+      questions: [
+        {
+          prompt: 'First example question prompt goes here?',
+          options: [
+            'First option (Correct answer)',
+            'Second option',
+            'Third option',
+            'Fourth option'
+          ],
+          answerIndex: 0
+        },
+        {
+          prompt: 'Second example question prompt goes here?',
+          options: [
+            'Choice A',
+            'Choice B (Correct answer)',
+            'Choice C',
+            'Choice D'
+          ],
+          answerIndex: 1
+        }
+      ]
+    };
+
+    function saveQuizProgress(quizId, state) {
+      if (typeof quizId !== 'string' || !quizId) return false;
+      try {
+        localStorage.setItem('quiz_hub_progress_' + quizId, JSON.stringify(state));
+        return true;
+      } catch (err) {
+        return false;
+      }
+    }
+    window.saveQuizProgress = saveQuizProgress;
+
+    function initQuizPage(config, rootEl) {
+      if (!rootEl || !config) return;
+      rootEl.textContent = '';
+
+      var header = document.createElement('header');
+
+      var subjectEl = document.createElement('span');
+      subjectEl.className = 'subject-tag';
+      subjectEl.textContent = config.subject || '';
+      header.appendChild(subjectEl);
+
+      var titleEl = document.createElement('h1');
+      titleEl.textContent = config.title || '';
+      header.appendChild(titleEl);
+
+      rootEl.appendChild(header);
+
+      var form = document.createElement('form');
+      form.className = 'quiz-form';
+
+      var questions = Array.isArray(config.questions) ? config.questions : [];
+
+      for (var i = 0; i < questions.length; i++) {
+        var q = questions[i];
+        var card = document.createElement('fieldset');
+        card.className = 'question-card';
+
+        var promptEl = document.createElement('legend');
+        promptEl.className = 'question-prompt';
+        promptEl.textContent = (i + 1) + '. ' + (q.prompt || '');
+        card.appendChild(promptEl);
+
+        var options = Array.isArray(q.options) ? q.options : [];
+        for (var optIdx = 0; optIdx < options.length; optIdx++) {
+          var label = document.createElement('label');
+          label.className = 'option-label';
+
+          var radio = document.createElement('input');
+          radio.type = 'radio';
+          radio.name = 'q-' + i;
+          radio.value = String(optIdx);
+
+          var optText = document.createElement('span');
+          optText.textContent = options[optIdx];
+
+          label.appendChild(radio);
+          label.appendChild(optText);
+          card.appendChild(label);
+        }
+
+        form.appendChild(card);
+      }
+
+      var submitBtn = document.createElement('button');
+      submitBtn.type = 'submit';
+      submitBtn.className = 'submit-btn';
+      submitBtn.textContent = 'Submit Quiz';
+      form.appendChild(submitBtn);
+
+      var resultEl = document.createElement('div');
+      resultEl.id = 'quiz-result';
+      resultEl.className = 'result-status';
+      resultEl.setAttribute('aria-live', 'polite');
+      resultEl.hidden = true;
+      form.appendChild(resultEl);
+
+      function onSubmit(e) {
+        if (e && e.preventDefault) e.preventDefault();
+        var total = questions.length;
+        var correct = 0;
+
+        for (var j = 0; j < total; j++) {
+          var selected = form.querySelector('input[name="q-' + j + '"]:checked');
+          if (selected && parseInt(selected.value, 10) === questions[j].answerIndex) {
+            correct++;
+          }
+        }
+
+        var score = total > 0 ? Math.round((correct / total) * 100) : 0;
+        resultEl.hidden = false;
+        resultEl.textContent = 'Score: ' + correct + ' / ' + total + ' (' + score + '%)';
+
+        saveQuizProgress(config.id, {
+          score: score,
+          completed: true,
+          updatedAt: Date.now()
+        });
+      }
+
+      form.addEventListener('submit', onSubmit);
+      submitBtn.addEventListener('click', onSubmit);
+      rootEl.appendChild(form);
+    }
+    window.initQuizPage = initQuizPage;
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', function() {
+        initQuizPage(window.QUIZ_CONFIG, document.getElementById('quiz-root'));
+      });
+    } else {
+      initQuizPage(window.QUIZ_CONFIG, document.getElementById('quiz-root'));
+    }
+  </script>
+</body>
+</html>
