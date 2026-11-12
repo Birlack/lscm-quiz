@@ -1,0 +1,1007 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="color-scheme" content="light dark">
+  <script>
+    try {
+      var savedScheme = localStorage.getItem('color-scheme');
+      if (savedScheme === 'light' || savedScheme === 'dark') {
+        document.querySelector('meta[name="color-scheme"]').setAttribute('content', savedScheme);
+        document.documentElement.setAttribute('data-theme', savedScheme);
+      }
+    } catch (e) {}
+  </script>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta property="og:title" content="Offline Quiz Hub">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="./">
+  <meta property="og:description" content="Mid-exam and Final-exam subject quizzes cached automatically for offline study">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/svg+xml" href="icon.svg">
+  <link rel="apple-touch-icon" href="icon.svg">
+  <title>Offline Quiz Hub</title>
+  <style>
+    :root {
+      --bg: #F7F4EE;
+      --panel: #EFE9DF;
+      --card: #FDFBF7;
+      --card-hover: #FFFFFF;
+      --raised: #E7DFD3;
+      --text: #1C1917;
+      --text-secondary: #57534E;
+      --text-muted: #66605B;
+      --hairline: rgba(28, 25, 23, 0.10);
+      --hairline-strong: rgba(28, 25, 23, 0.20);
+      --accent: #A16207;
+      --accent-ink: #FFFFFF;
+      --accent-tint: rgba(161, 98, 7, 0.10);
+      --positive: #15803D;
+      --positive-tint: rgba(21, 128, 61, 0.10);
+      --shadow-sm: 0 1px 2px rgba(28, 25, 23, 0.05);
+      --shadow-md: 0 8px 24px rgba(28, 25, 23, 0.06);
+      --ease: cubic-bezier(0.22, 1, 0.36, 1);
+      color-scheme: light dark;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        --bg: #12110F;
+        --panel: #161513;
+        --card: #1C1A18;
+        --card-hover: #262421;
+        --raised: #262421;
+        --text: #EFE9DE;
+        --text-secondary: #AAA398;
+        --text-muted: #8A847A;
+        --hairline: rgba(239, 233, 222, 0.10);
+        --hairline-strong: rgba(239, 233, 222, 0.22);
+        --accent: #D4A359;
+        --accent-ink: #12110F;
+        --accent-tint: rgba(212, 163, 89, 0.14);
+        --positive: #4CC38A;
+        --positive-tint: rgba(76, 195, 138, 0.14);
+        --shadow-sm: none;
+        --shadow-md: none;
+      }
+    }
+
+    :root[data-theme="dark"] {
+      color-scheme: dark;
+      --bg: #12110F;
+      --panel: #161513;
+      --card: #1C1A18;
+      --card-hover: #262421;
+      --raised: #262421;
+      --text: #EFE9DE;
+      --text-secondary: #AAA398;
+      --text-muted: #8A847A;
+      --hairline: rgba(239, 233, 222, 0.10);
+      --hairline-strong: rgba(239, 233, 222, 0.22);
+      --accent: #D4A359;
+      --accent-ink: #12110F;
+      --accent-tint: rgba(212, 163, 89, 0.14);
+      --positive: #4CC38A;
+      --positive-tint: rgba(76, 195, 138, 0.14);
+      --shadow-sm: none;
+      --shadow-md: none;
+    }
+
+    :root[data-theme="light"] {
+      color-scheme: light;
+      --bg: #F7F4EE;
+      --panel: #EFE9DF;
+      --card: #FDFBF7;
+      --card-hover: #FFFFFF;
+      --raised: #E7DFD3;
+      --text: #1C1917;
+      --text-secondary: #57534E;
+      --text-muted: #66605B;
+      --hairline: rgba(28, 25, 23, 0.10);
+      --hairline-strong: rgba(28, 25, 23, 0.20);
+      --accent: #A16207;
+      --accent-ink: #FFFFFF;
+      --accent-tint: rgba(161, 98, 7, 0.10);
+      --positive: #15803D;
+      --positive-tint: rgba(21, 128, 61, 0.10);
+      --shadow-sm: 0 1px 2px rgba(28, 25, 23, 0.05);
+      --shadow-md: 0 8px 24px rgba(28, 25, 23, 0.06);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100dvh;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      font-size: 15px;
+      line-height: 1.5;
+      font-variant-numeric: tabular-nums;
+      transition: background-color 180ms var(--ease), color 180ms var(--ease);
+      padding: max(24px, env(safe-area-inset-top)) max(24px, env(safe-area-inset-right)) max(48px, env(safe-area-inset-bottom)) max(24px, env(safe-area-inset-left));
+    }
+
+    .shell {
+      max-width: 1080px;
+      margin: 0 auto;
+    }
+
+    /* Header */
+    .topbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 16px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--hairline);
+      margin-bottom: 24px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-mark {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      display: grid;
+      place-items: center;
+      background: var(--card);
+      border: 1px solid var(--hairline);
+      color: var(--accent);
+      box-shadow: var(--shadow-sm);
+      flex-shrink: 0;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(1.5rem, 2.5vw, 1.875rem);
+      font-weight: 500;
+      letter-spacing: -0.02em;
+      line-height: 1.15;
+    }
+
+    .tagline {
+      margin: 4px 0 0;
+      color: var(--text-secondary);
+      font-size: 0.933rem;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .meta-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.867rem;
+      color: var(--text-muted);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    }
+
+    .status-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--positive);
+      flex-shrink: 0;
+    }
+
+    .theme-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 44px;
+      padding: 8px 16px;
+      border-radius: 8px;
+      border: 1px solid var(--hairline);
+      background: var(--card);
+      color: var(--text);
+      font: inherit;
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      box-shadow: var(--shadow-sm);
+      transition: background-color 150ms var(--ease), border-color 150ms var(--ease), transform 120ms var(--ease);
+    }
+
+    .theme-btn:hover {
+      background: var(--card-hover);
+      border-color: var(--hairline-strong);
+    }
+
+    .theme-btn:active { transform: scale(0.98); }
+
+    .theme-btn .icon-sun,
+    .theme-btn[aria-pressed="true"] .icon-moon { display: none; }
+    .theme-btn[aria-pressed="true"] .icon-sun { display: inline-block; }
+
+    button:focus-visible,
+    input:focus-visible,
+    a:focus-visible,
+    summary:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+
+    /* Interactive Filter Bar */
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 32px;
+    }
+
+    .search-wrap {
+      position: relative;
+      flex: 1 1 260px;
+      display: flex;
+      align-items: center;
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 12px;
+      color: var(--text-muted);
+      pointer-events: none;
+    }
+
+    #quiz-search {
+      width: 100%;
+      min-height: 44px;
+      padding: 8px 40px 8px 36px;
+      border-radius: 8px;
+      border: 1px solid var(--hairline);
+      background: var(--card);
+      color: var(--text);
+      font: inherit;
+      box-shadow: var(--shadow-sm);
+      transition: border-color 150ms var(--ease), background-color 150ms var(--ease);
+    }
+
+    #quiz-search::placeholder {
+      color: var(--text-muted);
+    }
+
+    #quiz-search:focus {
+      border-color: var(--accent);
+      outline: none;
+    }
+
+    .clear-search-btn {
+      position: absolute;
+      right: 0;
+      width: 44px;
+      height: 44px;
+      display: grid;
+      place-items: center;
+      border: none;
+      border-radius: 8px;
+      background: transparent;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: color 140ms var(--ease), background-color 140ms var(--ease);
+    }
+
+    .clear-search-btn:hover {
+      color: var(--text);
+      background: var(--raised);
+    }
+
+    .clear-search-btn[hidden] { display: none; }
+
+    .kbd-hint {
+      position: absolute;
+      right: 12px;
+      padding: 2px 6px;
+      border-radius: 4px;
+      border: 1px solid var(--hairline);
+      background: var(--panel);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      pointer-events: none;
+    }
+
+    .search-wrap:has(.clear-search-btn:not([hidden])) .kbd-hint { display: none; }
+
+    .exam-tabs {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px;
+      border-radius: 10px;
+      background: var(--panel);
+      border: 1px solid var(--hairline);
+    }
+
+    .exam-tab {
+      min-height: 44px;
+      padding: 8px 14px;
+      border-radius: 6px;
+      border: 1px solid transparent;
+      background: transparent;
+      color: var(--text-secondary);
+      font: inherit;
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background-color 150ms var(--ease), color 150ms var(--ease), border-color 150ms var(--ease);
+    }
+
+    .exam-tab:hover { color: var(--text); }
+
+    .exam-tab[aria-pressed="true"] {
+      background: var(--card);
+      color: var(--text);
+      border-color: var(--hairline);
+      box-shadow: var(--shadow-sm);
+    }
+
+    /* Two-column Wireframe Structure: Mid-exam | Final-exam */
+    .exam-board {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 24px;
+      align-items: start;
+    }
+
+    .exam-board:has(> section[data-exam]:not([hidden]):only-of-type),
+    .exam-board.single-visible {
+      grid-template-columns: minmax(0, 600px);
+      justify-content: center;
+    }
+
+    .exam-column {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .exam-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 20px;
+      border-radius: 20px;
+      border: 1px solid var(--hairline);
+      background: var(--card);
+      color: var(--text);
+      font-size: 1rem;
+      font-weight: 500;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .exam-column[data-exam="mid"] .exam-pill {
+      border-color: var(--accent);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), var(--shadow-sm);
+    }
+
+    .exam-pill svg {
+      color: var(--accent);
+      flex-shrink: 0;
+    }
+
+    .pill-count {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .exam-panel {
+      width: 100%;
+      border-radius: 24px;
+      border: 1px solid var(--hairline);
+      background: var(--panel);
+      padding: 12px;
+      box-shadow: var(--shadow-md);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      min-height: 360px;
+    }
+
+    /* Subject Cards inside each column (nested radius: 24 - 12 = 12px) */
+    .quiz-card {
+      position: relative;
+      border-radius: 12px;
+      border: 1px solid var(--hairline);
+      background: var(--card);
+      padding: 16px;
+      display: grid;
+      gap: 8px;
+      box-shadow: var(--shadow-sm);
+      transition: background-color 150ms var(--ease), border-color 150ms var(--ease);
+    }
+
+    .quiz-card:has(a.card-link:hover) {
+      background: var(--card-hover);
+      border-color: var(--accent);
+    }
+
+    .quiz-card:has(a.card-link:focus-visible) {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+
+    .quiz-card-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .subject-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+    }
+
+    .subject-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+    }
+
+    .meta-tag {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .quiz-card h3 {
+      margin: 0;
+      font-size: 1.05rem;
+      font-weight: 500;
+      line-height: 1.3;
+    }
+
+    .quiz-card a.card-link {
+      color: var(--text);
+      text-decoration: none;
+    }
+
+    .quiz-card a.card-link::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+    }
+
+    .quiz-card a.card-link:focus-visible { outline: none; }
+
+    .quiz-desc {
+      margin: 0;
+      font-size: 0.88rem;
+      color: var(--text-secondary);
+    }
+
+    .quiz-card-foot {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-top: 4px;
+    }
+
+    .badge-row {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .offline-badge {
+      display: inline-flex;
+      align-items: center;
+      font-size: 0.78rem;
+      font-weight: 500;
+      background: var(--positive-tint);
+      color: var(--positive);
+      padding: 2px 8px;
+      border-radius: 6px;
+      white-space: nowrap;
+    }
+
+    .score-chip {
+      display: inline-flex;
+      align-items: center;
+      font-size: 0.78rem;
+      font-weight: 500;
+      background: var(--accent-tint);
+      color: var(--accent);
+      padding: 2px 8px;
+      border-radius: 6px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    }
+
+    .card-arrow {
+      color: var(--text-muted);
+      transition: transform 150ms var(--ease), color 150ms var(--ease);
+      flex-shrink: 0;
+    }
+
+    .quiz-card:has(a.card-link:hover) .card-arrow {
+      transform: translateX(2px);
+      color: var(--accent);
+    }
+
+    /* Quiet upcoming rows (non-interactive slots mirroring balanced wireframe) */
+    .upcoming-slot {
+      border-radius: 12px;
+      border: 1px dashed var(--hairline);
+      padding: 12px 16px;
+      min-height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+    }
+
+    .upcoming-meta {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 32px 20px;
+      border-radius: 16px;
+      border: 1px dashed var(--hairline);
+      background: var(--panel);
+      color: var(--text-secondary);
+      margin-top: 20px;
+    }
+
+    .empty-state[hidden],
+    .exam-column[hidden],
+    .quiz-card[hidden] {
+      display: none;
+    }
+
+    .reset-filter-btn {
+      margin-top: 12px;
+      min-height: 44px;
+      padding: 8px 16px;
+      border-radius: 8px;
+      border: none;
+      background: var(--accent);
+      color: var(--accent-ink);
+      font: inherit;
+      font-weight: 500;
+      cursor: pointer;
+      transition: opacity 150ms var(--ease);
+    }
+
+    .reset-filter-btn:hover { opacity: 0.92; }
+
+    /* Quiet GitHub upload disclosure */
+    .hub-footer {
+      margin-top: 32px;
+      padding-top: 16px;
+      border-top: 1px solid var(--hairline);
+      color: var(--text-muted);
+      font-size: 0.88rem;
+    }
+
+    .hub-footer summary {
+      cursor: pointer;
+      min-height: 36px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--text-secondary);
+      font-weight: 500;
+      list-style: none;
+    }
+
+    .hub-footer summary::-webkit-details-marker { display: none; }
+    .hub-footer p { margin: 8px 0 0; max-width: 68ch; }
+    .hub-footer code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 0.84em;
+      padding: 1px 5px;
+      border-radius: 4px;
+      background: var(--panel);
+      border: 1px solid var(--hairline);
+    }
+
+    @media (max-width: 768px) {
+      body { padding: max(16px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) max(32px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left)); }
+      .exam-board { grid-template-columns: 1fr; gap: 24px; }
+      .kbd-hint { display: none; }
+      .exam-panel { min-height: auto; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H19a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6.5a1 1 0 0 1 0-5H20"/>
+          </svg>
+        </div>
+        <div>
+          <h1>Offline Quiz Hub</h1>
+          <p class="tagline">Exam practice by term, cached automatically after your first open</p>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <div class="meta-status" id="hub-stats">
+          <span class="status-dot" aria-hidden="true"></span>
+          <span id="cached-summary">Ready offline after first visit</span>
+        </div>
+        <button id="theme-toggle" type="button" class="theme-btn" aria-pressed="false" aria-label="Toggle color theme">
+          <svg class="icon-moon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>
+          </svg>
+          <svg class="icon-sun" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>
+          </svg>
+          <span id="theme-label">Theme</span>
+        </button>
+      </div>
+    </header>
+
+    <div class="toolbar" role="search">
+      <div class="search-wrap">
+        <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>
+        </svg>
+        <input id="quiz-search" type="search" placeholder="Search subjects" aria-label="Search subjects">
+        <button id="clear-search" type="button" class="clear-search-btn" aria-label="Clear search" hidden>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M18 6 6 18M6 6l12 12"/>
+          </svg>
+        </button>
+        <span class="kbd-hint" aria-hidden="true">/</span>
+      </div>
+
+      <div class="exam-tabs" role="group" aria-label="Filter by exam term">
+        <button type="button" class="exam-tab" data-exam-filter="all" aria-pressed="true">All Exams</button>
+        <button type="button" class="exam-tab" data-exam-filter="mid" aria-pressed="false">Mid-exam</button>
+        <button type="button" class="exam-tab" data-exam-filter="final" aria-pressed="false">Final-exam</button>
+      </div>
+    </div>
+
+    <main id="quiz-hub">
+      <div class="exam-board" id="exam-board">
+        <!-- Mid-exam Column -->
+        <section class="exam-column" data-exam="mid" aria-labelledby="mid-exam-heading">
+          <div class="exam-pill" id="mid-exam-heading">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/>
+            </svg>
+            <span>Mid-exam</span>
+            <span class="pill-count" id="mid-count">2</span>
+          </div>
+
+          <div class="exam-panel" data-subject="Mid-exam">
+            <article class="quiz-card" data-quiz-card data-exam="mid" data-search="public procurement planning assessment government mid-exam">
+              <div class="quiz-card-top">
+                <span class="subject-label"><span class="subject-dot" aria-hidden="true"></span>Government</span>
+                <span class="meta-tag">60 Qs · 5 Parts</span>
+              </div>
+              <h3>
+                <a class="card-link" href="quizzes/mid-exam/government-procurement.html" data-quiz-id="gov-procurement-mid">
+                  Public Procurement &amp; Planning Assessment
+                </a>
+              </h3>
+              <p class="quiz-desc">True/False, Multiple Choice, Fill in Blank, Matching &amp; Short Answer</p>
+              <div class="quiz-card-foot">
+                <div class="badge-row" data-badges="gov-procurement-mid"></div>
+                <svg class="card-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>
+                </svg>
+              </div>
+            </article>
+
+            <article class="quiz-card" data-quiz-card data-exam="mid" data-search="sample science quiz practice">
+              <div class="quiz-card-top">
+                <span class="subject-label"><span class="subject-dot" aria-hidden="true"></span>Science</span>
+                <span class="meta-tag">4 Qs · Practice</span>
+              </div>
+              <h3>
+                <a class="card-link" href="quizzes/science/sample-quiz.html" data-quiz-id="science-sample-quiz">
+                  Sample Science Quiz
+                </a>
+              </h3>
+              <p class="quiz-desc">Quick offline multiple-choice starter quiz</p>
+              <div class="quiz-card-foot">
+                <div class="badge-row" data-badges="science-sample-quiz"></div>
+                <svg class="card-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>
+                </svg>
+              </div>
+            </article>
+
+            <div class="upcoming-slot">
+              <span>Subject 3</span>
+              <span class="upcoming-meta">Coming soon</span>
+            </div>
+            <div class="upcoming-slot">
+              <span>Subject 4</span>
+              <span class="upcoming-meta">Coming soon</span>
+            </div>
+            <div class="upcoming-slot">
+              <span>Subject 5</span>
+              <span class="upcoming-meta">Coming soon</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- Final-exam Column -->
+        <section class="exam-column" data-exam="final" aria-labelledby="final-exam-heading">
+          <div class="exam-pill" id="final-exam-heading">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/>
+            </svg>
+            <span>Final-exam</span>
+            <span class="pill-count" id="final-count">0</span>
+          </div>
+
+          <div class="exam-panel" data-subject="Final-exam">
+            <div class="upcoming-slot">
+              <span>Public Procurement &amp; Planning — Final</span>
+              <span class="upcoming-meta">Coming soon</span>
+            </div>
+            <div class="upcoming-slot">
+              <span>Subject 2</span>
+              <span class="upcoming-meta">Coming soon</span>
+            </div>
+            <div class="upcoming-slot">
+              <span>Subject 3</span>
+              <span class="upcoming-meta">Coming soon</span>
+            </div>
+            <div class="upcoming-slot">
+              <span>Subject 4</span>
+              <span class="upcoming-meta">Coming soon</span>
+            </div>
+            <div class="upcoming-slot">
+              <span>Subject 5</span>
+              <span class="upcoming-meta">Coming soon</span>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <div id="empty-state" class="empty-state" hidden>
+        <p>No quizzes match your current filter</p>
+        <button id="clear-filters" type="button" class="reset-filter-btn">Show all quizzes</button>
+      </div>
+    </main>
+
+    <footer class="hub-footer">
+      <details>
+        <summary>How to add a new subject quiz via GitHub</summary>
+        <p>Upload a standalone <code>.html</code> quiz into <code>quizzes/mid-exam/</code> or <code>quizzes/final-exam/</code>, then add a <code>.quiz-card</code> link in <code>index.html</code> and commit to <code>main</code>.</p>
+      </details>
+    </footer>
+  </div>
+
+  <!-- Classic UI controller: runs identically on file:// and https:// without ES module CORS issues -->
+  <script>
+    (function () {
+      var PREFIX = 'quiz_hub_progress_';
+      var hub = document.getElementById('quiz-hub');
+      var board = document.getElementById('exam-board');
+      var searchInput = document.getElementById('quiz-search');
+      var clearSearchBtn = document.getElementById('clear-search');
+      var emptyState = document.getElementById('empty-state');
+      var clearBtn = document.getElementById('clear-filters');
+      var themeBtn = document.getElementById('theme-toggle');
+      var themeLabel = document.getElementById('theme-label');
+      var schemeMeta = document.querySelector('meta[name="color-scheme"]');
+      var examTabs = Array.prototype.slice.call(document.querySelectorAll('[data-exam-filter]'));
+      var activeExam = 'all';
+
+      // Theme toggle
+      var media = typeof window.matchMedia === 'function' ? window.matchMedia('(prefers-color-scheme: dark)') : null;
+      var isOsDark = function () { return Boolean(media && media.matches); };
+      var isEffectiveDark = function () {
+        var content = schemeMeta ? (schemeMeta.getAttribute('content') || 'light dark') : 'light dark';
+        if (content === 'dark') return true;
+        if (content === 'light') return false;
+        return isOsDark();
+      };
+      var syncTheme = function () {
+        var dark = isEffectiveDark();
+        if (themeBtn) themeBtn.setAttribute('aria-pressed', String(dark));
+        if (themeLabel) themeLabel.textContent = dark ? 'Dark' : 'Light';
+        if (document.documentElement) {
+          var content = schemeMeta ? (schemeMeta.getAttribute('content') || 'light dark') : 'light dark';
+          if (content === 'dark' || content === 'light') {
+            document.documentElement.setAttribute('data-theme', content);
+          } else {
+            document.documentElement.removeAttribute('data-theme');
+          }
+        }
+      };
+      syncTheme();
+
+      if (themeBtn && schemeMeta) {
+        themeBtn.addEventListener('click', function () {
+          var target = isEffectiveDark() ? 'light' : 'dark';
+          var osScheme = isOsDark() ? 'dark' : 'light';
+          if (target === osScheme) {
+            try { localStorage.removeItem('color-scheme'); } catch (e) {}
+            schemeMeta.setAttribute('content', 'light dark');
+          } else {
+            try { localStorage.setItem('color-scheme', target); } catch (e) {}
+            schemeMeta.setAttribute('content', target);
+          }
+          syncTheme();
+        });
+      }
+      if (media && typeof media.addEventListener === 'function') {
+        media.addEventListener('change', syncTheme);
+      }
+
+      // Filter & Search
+      var applyFilters = function () {
+        if (!hub) return;
+        var q = searchInput ? String(searchInput.value || '').trim().toLowerCase() : '';
+        if (clearSearchBtn) clearSearchBtn.hidden = q.length === 0;
+
+        var cards = hub.querySelectorAll('[data-quiz-card]');
+        var visibleByExam = { mid: 0, final: 0 };
+        var visibleCount = 0;
+
+        for (var i = 0; i < cards.length; i++) {
+          var card = cards[i];
+          var cardExam = (card.getAttribute('data-exam') || '').toLowerCase();
+          var hay = ((card.getAttribute('data-search') || '') + ' ' + (card.textContent || '')).toLowerCase();
+          var matches = (activeExam === 'all' || cardExam === activeExam) && (!q || hay.indexOf(q) !== -1);
+          card.hidden = !matches;
+          if (matches) {
+            visibleCount++;
+            visibleByExam[cardExam] = (visibleByExam[cardExam] || 0) + 1;
+          }
+        }
+
+        var sections = hub.querySelectorAll('section[data-exam]');
+        var visibleSections = 0;
+        for (var j = 0; j < sections.length; j++) {
+          var sec = sections[j];
+          var secExam = (sec.getAttribute('data-exam') || '').toLowerCase();
+          var showSec = (activeExam === 'all' || secExam === activeExam) && (!q || (visibleByExam[secExam] || 0) > 0);
+          sec.hidden = !showSec;
+          if (showSec) visibleSections++;
+        }
+
+        if (board && board.classList) {
+          board.classList.toggle('single-visible', visibleSections === 1);
+        }
+        if (emptyState) {
+          emptyState.hidden = !(visibleCount === 0 && (q !== '' || visibleSections === 0));
+        }
+      };
+
+      if (searchInput) searchInput.addEventListener('input', applyFilters);
+      if (clearSearchBtn && searchInput) {
+        clearSearchBtn.addEventListener('click', function () {
+          searchInput.value = '';
+          searchInput.focus();
+          applyFilters();
+        });
+      }
+
+      for (var t = 0; t < examTabs.length; t++) {
+        (function (tab) {
+          tab.addEventListener('click', function () {
+            activeExam = tab.getAttribute('data-exam-filter') || 'all';
+            for (var k = 0; k < examTabs.length; k++) {
+              examTabs[k].setAttribute('aria-pressed', String(examTabs[k] === tab));
+            }
+            applyFilters();
+          });
+        })(examTabs[t]);
+      }
+
+      if (clearBtn) {
+        clearBtn.addEventListener('click', function () {
+          if (searchInput) searchInput.value = '';
+          activeExam = 'all';
+          for (var k = 0; k < examTabs.length; k++) {
+            examTabs[k].setAttribute('aria-pressed', String(examTabs[k].getAttribute('data-exam-filter') === 'all'));
+          }
+          applyFilters();
+        });
+      }
+
+      window.addEventListener('keydown', function (e) {
+        if (e.key === '/' && searchInput && document.activeElement !== searchInput) {
+          var tag = document.activeElement && document.activeElement.tagName;
+          if (tag !== 'INPUT' && tag !== 'TEXTAREA') {
+            if (e.preventDefault) e.preventDefault();
+            searchInput.focus();
+          }
+        }
+      });
+
+      // Render saved localStorage scores & offline fallback badges (works on file:// too)
+      if (hub) {
+        try {
+          var anchors = hub.querySelectorAll('[data-quiz-id]');
+          var cachedCount = 0;
+          for (var a = 0; a < anchors.length; a++) {
+            var anchor = anchors[a];
+            var id = anchor.getAttribute('data-quiz-id');
+            var raw = localStorage.getItem(PREFIX + id);
+            if (!raw) continue;
+            var progress = JSON.parse(raw);
+            if (!progress || typeof progress.score !== 'number') continue;
+            cachedCount++;
+            var card = typeof anchor.closest === 'function' ? anchor.closest('[data-quiz-card]') : null;
+            var badgeRow = card ? card.querySelector('[data-badges="' + id + '"]') : null;
+            if (badgeRow) {
+              var chip = document.createElement('span');
+              chip.className = 'score-chip';
+              chip.textContent = progress.completed ? 'Score: ' + progress.score + '%' : 'In progress: ' + progress.score + '%';
+              badgeRow.appendChild(chip);
+            }
+          }
+          var summaryEl = document.getElementById('cached-summary');
+          if (summaryEl && cachedCount > 0) {
+            summaryEl.textContent = cachedCount + ' quiz' + (cachedCount === 1 ? '' : 'zes') + ' saved locally';
+          }
+        } catch (err) {}
+      }
+    })();
+  </script>
+
+  <!-- Progressive enhancement over HTTPS: Service Worker + Cache Storage badge sync -->
+  <script type="module">
+    import { decorateOfflineStatus, resolveOfflineQuizIds } from './src/hub.js';
+    import { getAllCachedQuizIds } from './src/storage.js';
+    import { registerServiceWorker } from './src/register-sw.js';
+
+    registerServiceWorker('./sw.js');
+
+    const hub = document.getElementById('quiz-hub');
+    const summaryEl = document.getElementById('cached-summary');
+    if (hub) {
+      const stored = getAllCachedQuizIds();
+      resolveOfflineQuizIds(hub, stored).then((ids) => {
+        decorateOfflineStatus(hub, ids);
+        if (summaryEl) {
+          summaryEl.textContent = ids.length > 0
+            ? `${ids.length} quiz${ids.length === 1 ? '' : 'zes'} cached offline`
+            : 'Ready offline after first visit';
+        }
+      });
+    }
+  </script>
+</body>
+</html>
